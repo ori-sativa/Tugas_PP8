@@ -1,0 +1,98 @@
+import numpy as np
+import imutils
+import cv2
+
+# Membaca Gambar
+image = cv2.imread("C:/Users/LENOVO/Downloads/image.jpg")
+cv2.imshow("Original", image)
+
+# Resize (Width)
+r = 150.0 / image.shape[1]
+dim = (150, int(image.shape[0] * r))
+resized_w = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+cv2.imshow("Resized (Width)", resized_w)
+
+# Resize (Height)
+r = 50.0 / image.shape[0]
+dim = (int(image.shape[1] * r), 50)
+resized_h = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+cv2.imshow("Resized (Height)", resized_h)
+
+# Resize via imutils
+resized_func = imutils.resize(image, width=100)
+cv2.imshow("Resized via Function", resized_func)
+
+# Translasi
+M = np.float32([[1, 0, 25], [0, 1, 50]])  # turun & kanan
+shifted = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
+cv2.imshow("Shifted Down and Right", shifted)
+
+M = np.float32([[1, 0, -50], [0, 1, -90]])  # naik & kiri
+shifted = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
+cv2.imshow("Shifted Up and Left", shifted)
+
+shifted = imutils.translate(image, 0, 100)  # ke bawah
+cv2.imshow("Shifted Down", shifted)
+
+# Rotasi
+(h, w) = image.shape[:2]
+center = (w // 2, h // 2)
+
+M = cv2.getRotationMatrix2D(center, 45, 1.0)
+rotated_45 = cv2.warpAffine(image, M, (w, h))
+cv2.imshow("Rotated 45 Degrees", rotated_45)
+
+M = cv2.getRotationMatrix2D(center, -90, 1.0)
+rotated_neg90 = cv2.warpAffine(image, M, (w, h))
+cv2.imshow("Rotated -90 Degrees", rotated_neg90)
+
+# Flipping (3 arah)
+flippedH = cv2.flip(image, 1)
+cv2.imshow("Flipped Horizontally", flippedH)
+
+flippedV = cv2.flip(image, 0)
+cv2.imshow("Flipped Vertically", flippedV)
+
+flippedHV = cv2.flip(image, -1)
+cv2.imshow("Flipped Horizontally & Vertically", flippedHV)
+
+# Brightness 
+M = np.ones(image.shape, dtype="uint8") * 100
+added = cv2.add(image, M)
+cv2.imshow("Added", added)
+
+M = np.ones(image.shape, dtype="uint8") * 50
+subtracted = cv2.subtract(image, M)
+cv2.imshow("Subtracted", subtracted)
+
+# Masking
+mask = np.zeros(image.shape[:2], dtype="uint8")
+(cX, cY) = (image.shape[1] // 2, image.shape[0] // 2)
+cv2.rectangle(mask, (cX - 75, cY - 75), (cX + 75, cY + 75), 255, -1)
+cv2.imshow("Mask", mask)
+
+masked = cv2.bitwise_and(image, image, mask=mask)
+cv2.imshow("Mask Applied to Image", masked)
+
+# Split & Merge Channels
+(B, G, R) = cv2.split(image)
+zeros = np.zeros(image.shape[:2], dtype="uint8")
+cv2.imshow("Red", cv2.merge([zeros, zeros, R]))
+cv2.imshow("Green", cv2.merge([zeros, G, zeros]))
+cv2.imshow("Blue", cv2.merge([B, zeros, zeros]))
+
+merged = cv2.merge([B, G, R])
+cv2.imshow("Merged", merged)
+
+# Konversi Warna 
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+cv2.imshow("Gray", gray)
+
+hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+cv2.imshow("HSV", hsv)
+
+lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+cv2.imshow("L*a*b*", lab)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
